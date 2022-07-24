@@ -1,0 +1,15 @@
+﻿Reuse,BOD(mg/l),COD(mg/l),TSS(mg/l),TN(mg/l),FC(MPN/l)
+Construction,15,45,10,20,200
+Road Cleaning,15,45,10,10,200
+Landscape,20,60,10,20,2000
+Industrial Cooling,10,30,10,10,2000
+Irrigation,40,100,10,20,20000
+Vehicle Washing,10,30,20,10,2000
+E-flow Inland Surface Water,30,250,100,100,10000
+Surface waters for drinking,10,30,10,10,2300
+Fire Protection,15,45,10,10,200
+Laundry Washing,10,30,10,20,250
+Dust Control,15,45,10,20,200
+Snow Making,15,45,10,10,22
+Outdoor Bathing ,3,10,10,10,5000
+Groundwater Recharge,5,10,10,1,1

@@ -1,0 +1,6 @@
+﻿Tech,Land,Power,Capital Cost,O&M Cost,BOD(mg/l),COD(mg/l),TSS(mg/l),TN(mg/l),FC(MPN/l)
+None,0,0,0,0,0,0,0,0,0
+MLE,0.04,120,6,0.6,0,0,0,75.5,90
+STEP BNR,0.04,135,8,0.2,0,0,0,81.25,90
+BARDENPH,0.099,150,8,0.2,0,0,0,62.5,90
+WUHERMAN,0.04,120,7,0.6,97.3,0,99.4,88.9,90
