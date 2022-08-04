@@ -100,7 +100,7 @@ with cols[2]:
 with cols[3]:
     weights['O&M Cost'] = st.selectbox("O&M cost weightage", avaliable_weights)
 
-
+st.write(weights)
 st.write(raw_waste_inputs)
 
 st.write("\n")
