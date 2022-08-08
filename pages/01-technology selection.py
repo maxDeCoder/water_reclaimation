@@ -166,7 +166,7 @@ if len(required_demand) != 0 and _continue:
     temp["Tech Stack"] = tech_stack_df["Tech Stack"]
     temp["Capital Cost"] = (temp["Capital Cost"]/10).map(lambda x: round(x, 2))
     temp["O&M Cost"] = (temp["O&M Cost"]/10).map(lambda x: round(x, 2))
-    st.write(temp)
+    # st.write(temp)
 
     if upgrade:
         temp = temp[temp["Tech Stack"].map(lambda x: x.split("+")[0]==current_tech)].reset_index(drop=True)
