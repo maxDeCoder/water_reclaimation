@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-import math
 
 
 try:
@@ -50,9 +49,10 @@ def match_for_config(df, targets, max_land, max_power, upgrade):
 
 def build_scatter(df):
     df["after treatment"] = df[waste_labels].apply(lambda x: ",\n".join([f"{label}:{round(x[label], 2)}" for label in x.index]), axis=1)
-    max_size = df["Land weighted"].max()
-    df["size"] = df["Land weighted"].apply(lambda x: round(math.log(x*50/max_size), 2))
-
+    max_size = df["Land"].max()
+    df["size"] = df["Land"].apply(lambda x: round(x*50/max_size, 2))
+    df["Land"] = df["Land"].apply(lambda x: str(x) + " ha")
+    df["Power"] = df["Power"].apply(lambda x: str(x) + " kWh")
 
     fig = px.scatter(
         df,
@@ -60,7 +60,7 @@ def build_scatter(df):
         y="O&M Cost weighted",
         size="size",
         color="Power weighted",
-        hover_data=["after treatment", "Land weighted"],
+        hover_data=["after treatment", "Land", "Power"],
         text="Name",
         )
 
@@ -103,7 +103,7 @@ max_power = st.sidebar.number_input("Power upper limit(KWh)", 0)
 # costs
 st.sidebar.write("\n")
 st.sidebar.markdown("### Costs")
-land_cost = st.sidebar.number_input("Land Cost (Repees per Ha)", 0)
+land_cost = st.sidebar.number_input("Land Cost (Rupees per Ha)", 0)
 eletricity_cost = st.sidebar.number_input("Eletricity cost (Rupees per kWh)", 0)
 
 # weightage
@@ -131,7 +131,7 @@ with cols[3]:
 
 if len(set(weights.values())) != 4:
     _continue = False
-    st.write("Please select unique weight values for the parameters")
+    st.error("Please select unique weight values for the parameters")
 else:
     _continue = True
 
@@ -208,8 +208,8 @@ if len(required_demand) != 0 and _continue:
                 "Tertiary Tech": [tertiary],
                 "Land (ha)": [temp.loc[i, "Land"]],
                 "Power (KWh)": [temp.loc[i, "Power"]],
-                "Capital Cost (cr Repees)": [temp.loc[i, "Capital Cost"]],
-                "O&M Cost (cr Repees)": [temp.loc[i, "O&M Cost"]],
+                "Capital Cost (cr Rupees)": [temp.loc[i, "Capital Cost"]],
+                "O&M Cost/year (cr Rupees)": [temp.loc[i, "O&M Cost"]],
                 })
 
             names.append(f"{temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}")

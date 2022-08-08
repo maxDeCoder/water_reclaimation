@@ -1,13 +1,14 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
 st.set_page_config(layout="wide")
 
 def calc_score(s1, s2, r, c):
     return (s1*s2) + r + c
 
-@st.cache
+# @st.cache
 def load_descriptions():
     return {
         "wr": pd.read_csv("./dataframes/wr_score.csv"),
@@ -20,9 +21,9 @@ vuln_items = [
     "Level of groundwater table",
     "Demand and supply gap",
     "Proneness to drought",
-    "Population of vulnarable group",
+    "Population of vulnerable group",
     "STP density and performance",
-    "Infrastucture Resilience"
+    "Infrastructure Resilience"
 ]
 
 prep_items = [
@@ -33,11 +34,11 @@ prep_items = [
     "Demand for Reclaimed Water",
     "Water pricing Initiative",
     "Expansion for post-distribution network",
-    "Power Avaliblity",
-    "Land Avaliblity",
-    "Fund Avaliblity",
+    "Power Availability",
+    "Land Availability",
+    "Fund Availability",
     "Decentralized STPs",
-    "Upgradiblity of current STPs Technology",
+    "Upgradability of current STPs Technology",
     "STP connectivity cover"
 ]
 
@@ -48,7 +49,7 @@ def make_ranged_dict(labels, _range):
 
     return d
 
-@st.cache
+# @st.cache
 def get_indexes():
     S1_V_labels = ["Severe", "Poor", "Bad", "Low", "Average", "Good", "Excellent"]
     S1_V_index = make_ranged_dict(S1_V_labels, range(-3, 4))
@@ -68,8 +69,8 @@ def get_indexes():
     return {
         "Existing State": S1_V_index,
         "Implementation/Planning State": S1_P_index,
-        "Significance for Water Sufficiency": S2_index,
-        "Implact Reversibility": R_index,
+        "Significance": S2_index,
+        "Impact Reversibility": R_index,
         "Impact Cumulativeness": C_index
     }
 
@@ -91,22 +92,22 @@ def sum_score(scores):
 def to_list(scores):
     return [item.data for item in scores]
 
-color_map = {
-    -11
-}
+def bar_chart(df, x_col, y_col, colors=None, title="", x_axis_title=""):
+    # fig = go.Figure(data=[go.Bar(x=df[x_col], y=df[y_col])])
 
-def color_mapper(scores):
-    pass
-
-def bar_chart(df, x_col, y_col, title="", x_axis_title=""):
     fig = px.bar(
         df,
         x=x_col,
         y=y_col,
-        color=y_col,
+        # color="Color",
         title=title,
-        color_continuous_scale="bluered"
+        # color_continuous_scale="bluered"
     )
+
+    # set marker color
+    fig.update_traces(marker_color=colors)
+
+
 
     fig.update_layout(
         autosize=False,
@@ -119,30 +120,32 @@ def bar_chart(df, x_col, y_col, title="", x_axis_title=""):
     )
 
     fig.update_yaxes(
-        title="Count",
+        title="Score",
         showgrid=False,
     )
 
-    return fig.update_traces(
+    fig.update_traces(
         hoverinfo="text",
         insidetextfont=dict(
             color="white"
         ),
     )
 
+    return fig
 
-st.markdown("# Water Reclaimation Index")
-st.sidebar.markdown("# Water Reclaimation Index")
+
+st.markdown("# Water Reclamation Index")
+st.sidebar.markdown("# Water Reclamation Index")
 
 st.write("\n")
-st.subheader("Vulnerablity Assessment")
+st.subheader("Vulnerability Assessment")
 st.write("\n")
 
 indexes = get_indexes()
 comments = load_descriptions()
 
 vuln_scores = []
-keys = ["Existing State", "Significance for Water Sufficiency", "Implact Reversibility", "Impact Cumulativeness"]
+keys = ["Existing State", "Significance", "Impact Reversibility", "Impact Cumulativeness"]
 for label in vuln_items:
     with st.expander(label, True):
         columns = st.columns(4)
@@ -168,18 +171,25 @@ for label in vuln_items:
             key_id+=1
 
         vuln_scores.append(x)
-    
+
 vuln_value = sum_score(vuln_scores)
 a = comments["vuln"]["Lower"] <= vuln_value
 b = comments["vuln"]["Higher"] >= vuln_value
 c = a*b
 vuln_comment = comments["vuln"][c]["Comment"].to_list()[0]
 
+temp_df_vuln = comments["wr"]
+color_vuln = []
+for item in vuln_scores:
+    a = temp_df_vuln["Lower"] <= item.data
+    b = temp_df_vuln["Higher"] >= item.data
+    c = a*b
+    color_vuln.append(temp_df_vuln[c]["Color"].to_list()[0])
 
-st.markdown(f"##### Vulnerablity Score: {vuln_value}")
+st.markdown(f"##### Vulnerability Score: {vuln_value}")
 st.markdown(f"##### Comment: {vuln_comment}")
 
-with st.expander("Vulnerablity Interventions", False):
+with st.expander("Vulnerability Interventions", False):
     for item in interventions["V"]:
         # bullet point
         if item != "None":
@@ -190,7 +200,7 @@ st.subheader("Preparedness Assessment")
 st.write("\n")
 
 prep_scores = []
-keys = ["Implementation/Planning State", "Significance for Water Sufficiency", "Implact Reversibility", "Impact Cumulativeness"]
+keys = ["Implementation/Planning State", "Significance", "Impact Reversibility", "Impact Cumulativeness"]
 for label in prep_items:
     with st.expander(label, True):
         columns = st.columns(4)
@@ -223,6 +233,14 @@ b = comments["prep"]["Higher"] >= prep_value
 c = a*b
 prep_comment = comments["prep"][c]["Comment"].to_list()[0]
 
+color_prep = []
+for item in prep_scores:
+    a = temp_df_vuln["Lower"] <= item.data
+    b = temp_df_vuln["Higher"] >= item.data
+    c = a*b
+    color_prep.append(temp_df_vuln[c]["Color"].to_list()[0])
+
+colors = color_vuln + color_prep
 
 st.markdown(f"##### Preparedness Score: {prep_value}")
 st.markdown(f"##### Comment: {prep_comment}")
@@ -233,13 +251,15 @@ with st.expander("Preparedness Interventions", False):
             st.markdown(f"* {item}")
 st.write("\n")
 st.markdown(f"### Total Score: {vuln_value+prep_value}")
-
+# st.write(colors)
 st.plotly_chart(bar_chart(
     pd.DataFrame({
         "Parameter": vuln_items + prep_items,
-        "Score": to_list(vuln_scores) + to_list(prep_scores)
+        "Score": to_list(vuln_scores) + to_list(prep_scores),
+        "Color": colors
     }), "Parameter", "Score",
     title="Score for each parameter",
-    x_axis_title="Parameter"
+    x_axis_title="Parameter",
+    colors=colors
 ))
 

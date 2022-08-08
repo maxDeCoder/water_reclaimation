@@ -1,6 +1,6 @@
-Comment,Lower,Higher
-Extreme,-88,-54
-Severe,-53,-18
-Moderate,-17,17
-Significant,17,52
-Low,53,88
+Comment,Lower,Higher,Color
+Extreme,-88,-54,red
+Severe,-53,-18,orange
+Moderate,-17,17,yellow
+Significant,17,52,blue
+Low,53,88,green
