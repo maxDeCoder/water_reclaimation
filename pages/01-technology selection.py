@@ -147,7 +147,9 @@ if len(required_demand) != 0 and _continue:
     if upgrade:
         current_tech = st.selectbox("Select your technology", tech_primary["Tech"])
         LPCO = tech_primary[tech_primary["Tech"] == current_tech][dev_labels].to_numpy()
+        # st.write(LPCO)
         LPCO *= stp_capacity
+        # st.write(LPCO)
         LPCO = list(LPCO)
 
     _text = []
@@ -164,8 +166,8 @@ if len(required_demand) != 0 and _continue:
     after_treatment = tech_stack_df[waste_labels + dev_labels] * raw_waste_array
     temp = after_treatment.copy()
     temp["Tech Stack"] = tech_stack_df["Tech Stack"]
-    temp["Capital Cost"] = (temp["Capital Cost"]/10).map(lambda x: round(x, 2))
-    temp["O&M Cost"] = (temp["O&M Cost"]/10).map(lambda x: round(x, 2))
+    temp["Capital Cost"] = (temp["Capital Cost"]).map(lambda x: round(x, 2))
+    temp["O&M Cost"] = (temp["O&M Cost"]).map(lambda x: round(x, 2))
     # st.write(temp)
 
     if upgrade:
@@ -181,6 +183,7 @@ if len(required_demand) != 0 and _continue:
 
     if upgrade:
         LPCO = np.array(LPCO * len(temp))
+        # st.write(temp)
         new_values = temp[dev_labels].to_numpy() - LPCO
         temp[dev_labels] = new_values
         # st.write(new_values)  
@@ -208,8 +211,8 @@ if len(required_demand) != 0 and _continue:
                 "Tertiary Tech": [tertiary],
                 "Land (ha)": [temp.loc[i, "Land"]],
                 "Power (KWh)": [temp.loc[i, "Power"]],
-                "Capital Cost (cr Rupees)": [temp.loc[i, "Capital Cost"]],
-                "O&M Cost/year (cr Rupees)": [temp.loc[i, "O&M Cost"]],
+                "Capital Cost (cr Rupees)": [temp.loc[i, "Capital Cost"]/10],
+                "O&M Cost/year (cr Rupees)": [temp.loc[i, "O&M Cost"]/10],
                 })
 
             names.append(f"{temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}")
