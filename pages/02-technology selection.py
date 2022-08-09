@@ -98,7 +98,7 @@ raw_waste_inputs["cap_for_om"] = stp_capacity
 
 max_land = st.sidebar.number_input("Land upper limit(ha)", 0)
 
-max_power = st.sidebar.number_input("Power upper limit(KWh)", 0)
+max_power = st.sidebar.number_input("Power upper limit(KWh)/day", 0)
 
 # costs
 st.sidebar.write("\n")
@@ -143,15 +143,6 @@ desired_reuse = dict.fromkeys(waste_labels)
 required_demand = reuse_df[reuse_df["Reuse"].isin(desired_reuse_selection)].reset_index().drop(columns=["index"])
 
 if len(required_demand) != 0 and _continue:
-    upgrade = st.checkbox("Is there an already installed STP?")
-    if upgrade:
-        current_tech = st.selectbox("Select your technology", tech_primary["Tech"])
-        LPCO = tech_primary[tech_primary["Tech"] == current_tech][dev_labels].to_numpy()
-        # st.write(LPCO)
-        LPCO *= stp_capacity
-        # st.write(LPCO)
-        LPCO = list(LPCO)
-
     _text = []
     for label in waste_labels:
         _value = min(required_demand[label])
@@ -161,7 +152,14 @@ if len(required_demand) != 0 and _continue:
     _ = [st.markdown(t) for t in _text]
 
     st.write("\n")
-
+    upgrade = st.checkbox("Is there an already installed STP?")
+    if upgrade:
+        current_tech = st.selectbox("Select your technology", tech_primary["Tech"])
+        LPCO = tech_primary[tech_primary["Tech"] == current_tech][dev_labels].to_numpy()
+        # st.write(LPCO)
+        LPCO *= stp_capacity
+        # st.write(LPCO)
+        LPCO = list(LPCO)
     raw_waste_array = np.array([[v for k, v in raw_waste_inputs.items()] for _ in range(len(tech_stack_df))])
     after_treatment = tech_stack_df[waste_labels + dev_labels] * raw_waste_array
     temp = after_treatment.copy()
@@ -171,62 +169,103 @@ if len(required_demand) != 0 and _continue:
     # st.write(temp)
 
     if upgrade:
+        temp_no_upgrade = temp.copy()
         temp = temp[temp["Tech Stack"].map(lambda x: x.split("+")[0]==current_tech)].reset_index(drop=True)
 
     temp = temp[match_for_config(after_treatment, desired_reuse, max_land, max_power, upgrade)]
-    temp["Land weighted"] = (temp["Land"] * land_cost * weights["Land"]).map(int)
-    temp["Power weighted"] = (temp["Power"] * eletricity_cost * weights["Power"]).map(int)
-    temp["Capital Cost weighted"] = (temp["Capital Cost"] * 1000000 * weights["Capital Cost"]).map(int)
-    temp["O&M Cost weighted"] = (temp["O&M Cost"] * 1000000 * weights["O&M Cost"]).map(int)
-    temp["Total Cost weighted"] = temp["Land weighted"] + temp["Power weighted"] + temp["Capital Cost weighted"] + temp["O&M Cost weighted"]
-    
-
     if upgrade:
-        LPCO = np.array(LPCO * len(temp))
-        # st.write(temp)
-        new_values = temp[dev_labels].to_numpy() - LPCO
-        temp[dev_labels] = new_values
-        # st.write(new_values)  
+        temp_no_upgrade = temp_no_upgrade[match_for_config(after_treatment, desired_reuse, max_land, max_power, False)]
 
-    cols = temp.columns.tolist()
-    cols = cols[-1:] + cols[:-1]
-    temp = temp[cols]
+    if len(temp) != 0:
+        temp["Land weighted"] = (temp["Land"] * land_cost * weights["Land"]).map(int)
+        temp["Power weighted"] = (temp["Power"] * eletricity_cost * weights["Power"]).map(int)
+        temp["Capital Cost weighted"] = (temp["Capital Cost"] * 1000000 * weights["Capital Cost"]).map(int)
+        temp["O&M Cost weighted"] = (temp["O&M Cost"] * 1000000 * weights["O&M Cost"]).map(int)
+        temp["Total Cost weighted"] = temp["Land weighted"] + temp["Power weighted"] + temp["Capital Cost weighted"] + temp["O&M Cost weighted"]
+        
+        show_in_graph = []
+        names = []
 
-    temp.sort_values("Total Cost weighted", inplace=True)
-    temp.reset_index(drop=True, inplace=True)
-    # try:
-    show_in_graph = []
-    names = []
+        if upgrade:
+            temp_no_upgrade["Land weighted"] = (temp_no_upgrade["Land"] * land_cost * weights["Land"]).map(int)
+            temp_no_upgrade["Power weighted"] = (temp_no_upgrade["Power"] * eletricity_cost * weights["Power"]).map(int)
+            temp_no_upgrade["Capital Cost weighted"] = (temp_no_upgrade["Capital Cost"] * 1000000 * weights["Capital Cost"]).map(int)
+            temp_no_upgrade["O&M Cost weighted"] = (temp_no_upgrade["O&M Cost"] * 1000000 * weights["O&M Cost"]).map(int)
+            temp_no_upgrade["Total Cost weighted"] = temp_no_upgrade["Land weighted"] + temp_no_upgrade["Power weighted"] + temp_no_upgrade["Capital Cost weighted"] + temp_no_upgrade["O&M Cost weighted"]
 
-    if upgrade:
-        st.warning('Since you have opted for an upgrade, the land and power upper limit with not be considered')
+            cols = temp_no_upgrade.columns.to_list()
+            cols = cols[-1:]+cols[:-1]
+            temp_no_upgrade = temp_no_upgrade[cols]
 
-    for i in temp.index:
-        with st.expander(f"{i+1} - {temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
-            primary, secondary, tertiary = temp['Tech Stack'].to_list()[i].split("+")
-            show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True, key=i))
-            st.dataframe({
-                "Secondary Tech": [primary], 
-                "Emerging Tech": [secondary], 
-                "Tertiary Tech": [tertiary],
-                "Land (ha)": [temp.loc[i, "Land"]],
-                "Power (KWh)": [temp.loc[i, "Power"]],
-                "Capital Cost (cr Rupees)": [temp.loc[i, "Capital Cost"]/10],
-                "O&M Cost/year (cr Rupees)": [temp.loc[i, "O&M Cost"]/10],
-                })
+            temp_no_upgrade.sort_values(by="Total Cost weighted", inplace=True)
+            temp_no_upgrade.reset_index(drop=True, inplace=True)
 
-            names.append(f"{temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}")
+            LPCO = np.array(LPCO * len(temp))
+            # st.write(temp)
+            new_values = temp[dev_labels].to_numpy() - LPCO
+            temp[dev_labels] = new_values
+            # st.write(new_values)  
 
-    temp["Name"] = names
-    temp = temp[show_in_graph]
+        cols = temp.columns.tolist()
+        cols = cols[-1:] + cols[:-1]
+        temp = temp[cols]
 
-    st.write("\n")
+        temp.sort_values("Total Cost weighted", inplace=True)
+        temp.reset_index(drop=True, inplace=True)
+        # try:
+        
+        if upgrade:
+            st.warning('Since you have opted for an upgrade, the land and power upper limit with not be considered')
+            st.subheader("Upgrade options:")
+        else:
+            st.subheader("Avaliable options:")
+        for i in temp.index:
+            with st.expander(f"{i+1} - {temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
+                primary, secondary, tertiary = temp['Tech Stack'].to_list()[i].split("+")
+                show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True, key=i))
+                st.dataframe({
+                    "Secondary Tech": [primary], 
+                    "Emerging Tech": [secondary], 
+                    "Tertiary Tech": [tertiary],
+                    "Land (ha)": [temp.loc[i, "Land"]],
+                    "Power (KWh)": [temp.loc[i, "Power"]],
+                    "Capital Cost (cr Rupees)": [temp.loc[i, "Capital Cost"]/10],
+                    "O&M Cost/year (cr Rupees)": [temp.loc[i, "O&M Cost"]/10],
+                    })
 
-    st.plotly_chart(build_scatter(temp))
+                names.append(f"{temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}")
 
-    dump_data = [temp.iloc[i].to_dict() for i in range(len(temp))]
+        if upgrade:
+            st.subheader("No Upgrade options:")
+            for i in temp_no_upgrade.index:
+                with st.expander(f"{i+1} - {temp_no_upgrade.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
+                    primary, secondary, tertiary = temp_no_upgrade['Tech Stack'].to_list()[i].split("+")
+                    show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True, key=i+50))
+                    st.dataframe({
+                        "Secondary Tech": [primary], 
+                        "Emerging Tech": [secondary], 
+                        "Tertiary Tech": [tertiary],
+                        "Land (ha)": [temp_no_upgrade.loc[i, "Land"]],
+                        "Power (KWh)": [temp_no_upgrade.loc[i, "Power"]],
+                        "Capital Cost (cr Rupees)": [temp_no_upgrade.loc[i, "Capital Cost"]/10],
+                        "O&M Cost/year (cr Rupees)": [temp_no_upgrade.loc[i, "O&M Cost"]/10],
+                        })
 
-    json.dump(dump_data, open("config.json", "w"))
-    # except:
-    #     st.write("No matching technology found")
+                    names.append(f"{temp_no_upgrade.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}")
+            temp = temp.append(temp_no_upgrade)
 
+        temp["Name"] = names
+        temp = temp[show_in_graph]
+
+        st.write("\n")
+
+        st.plotly_chart(build_scatter(temp))
+
+        dump_data = [temp.iloc[i].to_dict() for i in range(len(temp))]
+
+        json.dump(dump_data, open("config.json", "w"))
+        # except:
+        #     st.write("No matching technology found")
+
+    else:
+        st.error("Projected land/power requirements exceed defined upper limits. Increase upper limits for obtaining suggestions.")

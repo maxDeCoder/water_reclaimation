@@ -1,10 +1,13 @@
+from ast import excepthandler
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-st.set_page_config(layout="wide")
-
+try:
+    st.set_page_config(layout="wide")
+except:
+    pass
 def calc_score(s1, s2, r, c):
     return (s1*s2) + r + c
 
@@ -99,15 +102,13 @@ def bar_chart(df, x_col, y_col, colors=None, title="", x_axis_title=""):
         df,
         x=x_col,
         y=y_col,
-        # color="Color",
         title=title,
-        # color_continuous_scale="bluered"
+        text=y_col,
     )
+    
 
     # set marker color
     fig.update_traces(marker_color=colors)
-
-
 
     fig.update_layout(
         autosize=False,
@@ -195,6 +196,9 @@ with st.expander("Vulnerability Interventions", False):
         if item != "None":
             st.markdown(f"* {item}")
 
+with st.expander("VI calculation formula", False):
+    st.markdown("##### VI = Σ(Existing State * Significance + Impact Reversibility + Impact Cumulativeness)")
+
 st.write("\n")
 st.subheader("Preparedness Assessment")
 st.write("\n")
@@ -249,9 +253,18 @@ with st.expander("Preparedness Interventions", False):
         # bullet point
         if item != "None":
             st.markdown(f"* {item}")
+
+with st.expander("PI calculation formula", False):
+    st.markdown("##### PI = Σ (Implementation/Planning State * Significance + Impact Reversibility + Impact Cumulativeness)")
+
 st.write("\n")
 st.markdown(f"### Total Score: {vuln_value+prep_value}")
+
+with st.expander("Total Score calculation formula", False):
+    st.markdown("##### Total Score = VI + PI")
+
 # st.write(colors)
+st.markdown("🟥 - Very Poor  🟧 - Poor  🟨 - Bad  🟦 - Satisfactory  🟩 - Good")
 st.plotly_chart(bar_chart(
     pd.DataFrame({
         "Parameter": vuln_items + prep_items,
@@ -262,4 +275,3 @@ st.plotly_chart(bar_chart(
     x_axis_title="Parameter",
     colors=colors
 ))
-

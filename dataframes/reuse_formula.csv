@@ -1,0 +1,21 @@
+﻿Reuse,Formula,Legends
+Industrial Cooling,D= N*W*C,N= Number of Industries; C=Capacity (MW); W= Water requirement per Industry per month (Avg. requirement= 3.5 cu m per h per MW)
+Dust Control,D= A*W,A= Area in sq. m; W= Water required per area of dust control
+Fire Protection,D= 100 * sqrt(P),P= Population of city in thousands
+Toilet Flushing ,D= DD*P*W,DD=  Domestic water supply in lpcd; P= Population; W= Toilet flushing percentage (29% as per IS Code)
+Rail Washing,D= WG*T*p + WC*P*ST*p + P*A*WP*p + NP*WD*u,WG= Water per carriage per day for BG/MG; T= number of trains terminating/originating; p= probability of washing; WC=Water for cleaning carriage at platform; P= number of platforms; ST= number of stopping trains; A= average area of platform/apron; WP= water required for platform and apron; NP= Number of passengers; WD=average water demand; u= probability of use
+Vehicle Washing ,D= N*W,N = Number of vehicles; W = Average Water requirement per vehicle
+Construction,D= N*W,N = Number of construction sites; W = Average Water requirement per site
+Laundry Washing ,D= N*W*n,N=  Total Number of Dhobi-ghats; W= Average water required for each laundry; C= Average Number of Clothes per day
+Road Cleaning,D= L*B*W*P,L= Length of road; B= Width of road; W= Average water required per area; P= Probability of washing
+E-flow Augmentation,D= N*Q*0.3,Q =  Avg. Drain capacity (Assuming 30% excess); N =  Number of drain for augmentation
+Hotels,D= N*P*A,N= Number of hotel; P= Number of people in hotel; A= Allocation per head as per IS code
+Hospitals,D= N*B*A,N= Number of hospital; B= Number of beds; A= Allocation per head as per IS code
+Resorts,D= N*P*A + S*F + G*W,N= Number of resorts; P= Number of people; A= Allocation per head as per IS code; S= Swimming pool volume; F=frequency of water change; G=gardening area; W= water per garden area
+Landscape,D= A*W,A= Area in sq. m; W= Water required per area
+Groundwater Recharge,D= V* (1+L%),V= Volume of aquifer; L= Loss factor (%)
+Outdoor Bathing,D= N*W,N = Number of people; W = Average Water requirement per person
+Factories,D= N*W*A or D= P*C,N= Number of factories; W= water required per activity; A= Number of activities; P= Number of people; C=Allocation as per IS code
+Gardening/ Agriculture/Horticulture,D= A*W,A= Total area; W= Water required based on plant/ crops
+,,
+,,
