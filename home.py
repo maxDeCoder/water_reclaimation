@@ -5,6 +5,9 @@ st.set_page_config(layout="wide")
 
 content = pd.read_csv("./dataframes/content_tech.csv")
 
+# insert image from this link : https://www.thestatesman.com/wp-content/uploads/2021/08/QT-Water-Purification.jpg
+st.markdown("<img src='https://www.thestatesman.com/wp-content/uploads/2021/08/QT-Water-Purification.jpg' width='100%'/>", unsafe_allow_html=True)
+
 st.subheader("Welcome to Decision Support System for Appropriate Wastewater Treatment Technology Selection")
 st.write("Water scarcity has been regarded as a global risk with potentially devastating impacts. Climate change, exploding population, and industrialization are the main drivers behind such an imbalance in safe water availability. India is predicted to get most severely impacted by water scarcity owing to its high urban population. To tackle this imbalance between water demand and its safe availability, wastewater reclamation can be seen as a potential source of water, which if treated, can boost water availability as well as prevent environmental degradation. When treated wastewater is reutilized after treatment, it is referred to as wastewater reclamation. Municipal wastewater is considered a limitless source of water due to its high biodegradability and low toxicity profile. Globally, 80% of the wastewater generated is disposed of in the environment, causing hazardous impacts on the receiving water bodies. The burden of environmental degradation and water scarcity can be significantly reduced by utilizing treated wastewater as a water source. Several industrial and domestic activities do not require reliance on high-quality potable water but can utilize reclaimed water to obscure the issue of water scarcity. By observing the trend of water demand and the definition of relevant quality criteria, raw wastewater can be treated to produce a secondary water source.")
 st.write("\n")
