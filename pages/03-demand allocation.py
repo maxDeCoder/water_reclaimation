@@ -26,6 +26,9 @@ def load_tech():
 
 _, _, _, reuse_df, tech_stack_df = load_tech()
 
+demand_formula = pd.read_csv("./dataframes/demand_formula.csv")
+demand_formula["Formula"] = demand_formula["Formula"].apply(lambda x: x.replace("*", " * "))
+
 reuse_to_category = pd.read_csv("./dataframes/reuse_to_category.csv")
 
 st.markdown("# Reclaimed Water Demand Allocation & Pricing")
@@ -214,3 +217,15 @@ if break_even > 0:
     st.markdown(f"##### At average price of {round(cost_per_kld, 2)}, you can expect to achieve break even after {break_even+1} years and be profitable.")
 else:
     st.warning("Break even cannot be achieved in 15 years, try changing the technology or the cost per KLD")
+
+with st.expander("How to calculate demand?", False):
+    # first reuse name, then the formula, then the legends, then a horizontal line
+    for i in demand_formula.index:
+        reuse = demand_formula.loc[i, "Reuse"]
+        formula = demand_formula.loc[i, "Formula"]
+        legend = demand_formula.loc[i, "Legends"]
+
+        st.subheader(f"{reuse}")
+        st.write(f"###### {formula}")
+        st.write(f"{legend}")
+        st.markdown("""---""")
