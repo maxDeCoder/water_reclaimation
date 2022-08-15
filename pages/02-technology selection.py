@@ -4,7 +4,6 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 
-
 try:
     st.set_page_config(layout="wide")
 except:
@@ -184,6 +183,7 @@ if len(required_demand) != 0 and _continue:
         temp["Total Cost weighted"] = temp["Land weighted"] + temp["Power weighted"] + temp["Capital Cost weighted"] + temp["O&M Cost weighted"]
         
         show_in_graph = []
+        top_n = 5
         names = []
 
         if upgrade:
@@ -222,7 +222,9 @@ if len(required_demand) != 0 and _continue:
         for i in temp.index:
             with st.expander(f"{i+1} - {temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                 primary, secondary, tertiary = temp['Tech Stack'].to_list()[i].split("+")
-                show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True, key=i))
+                
+                show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True if i <= top_n-1 else False, key=i))
+                
                 st.dataframe({
                     "Secondary Tech": [primary], 
                     "Emerging Tech": [secondary], 
@@ -240,7 +242,7 @@ if len(required_demand) != 0 and _continue:
             for i in temp_no_upgrade.index:
                 with st.expander(f"{i+1} - {temp_no_upgrade.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                     primary, secondary, tertiary = temp_no_upgrade['Tech Stack'].to_list()[i].split("+")
-                    show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True, key=i+50))
+                    show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True if i <= top_n-1 else False, key=i+50))
                     st.dataframe({
                         "Secondary Tech": [primary], 
                         "Emerging Tech": [secondary], 
@@ -258,7 +260,6 @@ if len(required_demand) != 0 and _continue:
         temp = temp[show_in_graph]
 
         st.write("\n")
-
         st.plotly_chart(build_scatter(temp))
 
         dump_data = [temp.iloc[i].to_dict() for i in range(len(temp))]
