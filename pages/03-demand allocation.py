@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 import json
+from random import randint
 
 # DODO: Mininmum requirement selection
 # DODO: Change from category to reuse purpose
@@ -69,11 +70,11 @@ reuse_dict = {
 for i in range(num_reuse):
     cols = st.columns(2)
     with cols[0]:
-        selected = st.selectbox("Reuse Purpose", reuse_to_category["Reuse"], key=i)
+        selected = st.selectbox("Reuse Purpose", reuse_to_category["Reuse"], key=i+randint(0,1000))
         reuse_dict["Reuse"].append(selected)
         reuse_dict["Category"].append(reuse_to_category[reuse_to_category["Reuse"] == selected]["Category"].to_list()[0])
     with cols[1]:
-        reuse_dict["Demand"].append(st.number_input("Demand", value=0, min_value=0, key=i))
+        reuse_dict["Demand"].append(st.number_input("Demand (MLD)", value=0, min_value=0, key=i+randint(0,1000)))
 
 df = pd.DataFrame(reuse_dict)
 st.markdown(f"### Total demand: {df['Demand'].sum()} MLD")
