@@ -33,18 +33,18 @@ def match_for_config(df, targets, max_land, max_power, upgrade):
 
     desired_reuse_array = np.array([[v for k, v in targets.items()] for _ in range(len(df))])
 
-    waste_values = after_treatment[waste_labels].to_numpy()
-    land_power = after_treatment[["Land", "Power"]].to_numpy()
+    waste_values = df[waste_labels].to_numpy()
+    land_power = df[["Land", "Power"]].to_numpy()
     land_power_max = np.array([max_land, max_power])
 
-    for i in range(len(df)):
-        if not upgrade:
-            s.append(np.all(waste_values[i] < desired_reuse_array[i]) and np.all(land_power[i] < land_power_max))
-        else:
-            s.append(np.all(waste_values[i] < desired_reuse_array[i]))
-        
+    a = np.all(waste_values < desired_reuse_array, axis=-1)
+    b = np.all(land_power < land_power_max, axis=1)
 
-    return pd.Series(s)
+    if upgrade:
+        return a
+    else:
+        return np.all(np.array([a,b]).T, axis=-1)
+
 
 def build_scatter(df):
     df["after treatment"] = df[waste_labels].apply(lambda x: ",\n".join([f"{label}:{round(x[label], 2)}" for label in x.index]), axis=1)
@@ -165,15 +165,18 @@ if len(required_demand) != 0 and _continue:
     temp["Tech Stack"] = tech_stack_df["Tech Stack"]
     temp["Capital Cost"] = (temp["Capital Cost"]).map(lambda x: round(x, 2))
     temp["O&M Cost"] = (temp["O&M Cost"]).map(lambda x: round(x, 2))
-    # st.write(temp)
 
     if upgrade:
         temp_no_upgrade = temp.copy()
         temp = temp[temp["Tech Stack"].map(lambda x: x.split("+")[0]==current_tech)].reset_index(drop=True)
-
-    temp = temp[match_for_config(after_treatment, desired_reuse, max_land, max_power, upgrade)]
+    
+    # st.write(test)
+    
+    temp = temp[match_for_config(temp, desired_reuse, max_land, max_power, upgrade)]
+    # st.write(temp)
     if upgrade:
         temp_no_upgrade = temp_no_upgrade[match_for_config(after_treatment, desired_reuse, max_land, max_power, False)]
+        # st.write(temp_no_upgrade)
 
     if len(temp) != 0:
         temp["Land weighted"] = (temp["Land"] * land_cost * weights["Land"]).map(int)
@@ -218,7 +221,7 @@ if len(required_demand) != 0 and _continue:
             st.warning('Since you have opted for an upgrade, the land and power upper limit with not be considered')
             st.subheader("Upgrade options:")
         else:
-            st.subheader("Avaliable options:")
+            st.subheader("Available options:")
         for i in temp.index:
             with st.expander(f"{i+1} - {temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                 primary, secondary, tertiary = temp['Tech Stack'].to_list()[i].split("+")
@@ -238,7 +241,7 @@ if len(required_demand) != 0 and _continue:
                 names.append(f"{temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}")
 
         if upgrade:
-            st.subheader("No Upgrade options:")
+            st.subheader("Supplementing with secondary technologies:")
             for i in temp_no_upgrade.index:
                 with st.expander(f"{i+1} - {temp_no_upgrade.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                     primary, secondary, tertiary = temp_no_upgrade['Tech Stack'].to_list()[i].split("+")
