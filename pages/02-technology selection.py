@@ -178,7 +178,7 @@ if len(required_demand) != 0 and _continue:
         temp_no_upgrade = temp_no_upgrade[match_for_config(after_treatment, desired_reuse, max_land, max_power, False)]
         # st.write(temp_no_upgrade)
 
-    if len(temp) != 0:
+    if len(temp) != 0 or len(temp_no_upgrade) != 0:
         temp["Land weighted"] = (temp["Land"] * land_cost * weights["Land"]).map(int)
         temp["Power weighted"] = (temp["Power"] * eletricity_cost * weights["Power"]).map(int)
         temp["Capital Cost weighted"] = (temp["Capital Cost"] * 1000000 * weights["Capital Cost"]).map(int)
@@ -202,12 +202,13 @@ if len(required_demand) != 0 and _continue:
 
             temp_no_upgrade.sort_values(by="Total Cost weighted", inplace=True)
             temp_no_upgrade.reset_index(drop=True, inplace=True)
+            if len(temp) > 0:
 
-            LPCO = np.array(LPCO * len(temp))
-            # st.write(temp)
-            new_values = temp[dev_labels].to_numpy() - LPCO
-            temp[dev_labels] = new_values
-            # st.write(new_values)  
+                LPCO = np.array(LPCO * len(temp))
+                # st.write(temp)
+                new_values = temp[dev_labels].to_numpy() - LPCO
+                temp[dev_labels] = new_values
+                # st.write(new_values)  
 
         cols = temp.columns.tolist()
         cols = cols[-1:] + cols[:-1]
