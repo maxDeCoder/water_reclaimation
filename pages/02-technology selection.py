@@ -169,13 +169,32 @@ if len(required_demand) != 0 and _continue:
     if upgrade:
         temp_no_upgrade = temp.copy()
         temp = temp[temp["Tech Stack"].map(lambda x: x.split("+")[0]==current_tech)].reset_index(drop=True)
+        # after_treatment = temp[waste_labels + dev_labels]
+
+        new_values = np.array([temp[waste_labels+dev_labels].iloc[0].to_numpy() for _ in range(len(tech_stack_df))])
+
+        # st.write(raw_waste_array)
+        # st.write(tech_stack_df[waste_labels + dev_labels] * raw_waste_array)
+        # st.write(temp.iloc[temp.index.to_list()[0]].to_dict())
+        # st.write(after_treatment)
+        # st.write(new_values)
+        after_treatment = new_values * tech_stack_df[waste_labels + dev_labels]
+        # temp_no_upgrade.loc[waste_labels + dev_labels] = after_treatment
+        # st.write(after_treatment)
+        # st.write(temp_no_upgrade.columns)
+        temp_no_upgrade[waste_labels + dev_labels]=after_treatment
+        # st.write(temp_no_upgrade)
+        # st.write(temp)
+
     
-    # st.write(test)
-    
+    # st.write(desired_reuse)
     temp = temp[match_for_config(temp, desired_reuse, max_land, max_power, upgrade)]
+    # st.write("non-supplementary")
     # st.write(temp)
+
     if upgrade:
         temp_no_upgrade = temp_no_upgrade[match_for_config(after_treatment, desired_reuse, max_land, max_power, False)]
+        # st.write("supplementary")
         # st.write(temp_no_upgrade)
 
     try:
