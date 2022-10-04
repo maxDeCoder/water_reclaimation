@@ -239,7 +239,9 @@ if len(required_demand) != 0 and _continue:
                 st.subheader("Upgrade options:")
             else:
                 st.subheader("Available options:")
-            for i in temp.index[:10]:
+
+            temp = temp[:10]
+            for i in temp.index:
                 with st.expander(f"{i+1} - {temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                     primary, secondary, tertiary = temp['Tech Stack'].to_list()[i].split("+")
                     
@@ -259,7 +261,8 @@ if len(required_demand) != 0 and _continue:
 
             if upgrade:
                 st.subheader("Supplementing with secondary technologies:")
-                for i in temp_no_upgrade.index[:10]:
+                temp_no_upgrade = temp_no_upgrade[:10]
+                for i in temp_no_upgrade.index:
                     with st.expander(f"{i+1} - {temp_no_upgrade.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                         primary, secondary, tertiary = temp_no_upgrade['Tech Stack'].to_list()[i].split("+")
                         show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True if i <= top_n-1 else False, key=i+50))
