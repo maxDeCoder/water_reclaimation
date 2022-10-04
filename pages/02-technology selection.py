@@ -171,19 +171,15 @@ if len(required_demand) != 0 and _continue:
         temp = temp[temp["Tech Stack"].map(lambda x: x.split("+")[0]==current_tech)].reset_index(drop=True)
         # after_treatment = temp[waste_labels + dev_labels]
 
-        new_values = np.array([temp[waste_labels+dev_labels].iloc[0].to_numpy() for _ in range(len(tech_stack_df))])
+        new_values = np.array([temp[waste_labels].iloc[0].to_numpy() for _ in range(len(tech_stack_df))])
 
-        # st.write(raw_waste_array)
-        # st.write(tech_stack_df[waste_labels + dev_labels] * raw_waste_array)
-        # st.write(temp.iloc[temp.index.to_list()[0]].to_dict())
-        # st.write(after_treatment)
-        # st.write(new_values)
-        after_treatment = new_values * tech_stack_df[waste_labels + dev_labels]
+        st.write(new_values)
+        after_treatment[waste_labels] = new_values * tech_stack_df[waste_labels]
         # temp_no_upgrade.loc[waste_labels + dev_labels] = after_treatment
         # st.write(after_treatment)
         # st.write(temp_no_upgrade.columns)
-        temp_no_upgrade[waste_labels + dev_labels]=after_treatment
-        # st.write(temp_no_upgrade)
+        temp_no_upgrade[waste_labels]=after_treatment[waste_labels]
+        st.write(temp_no_upgrade)
         # st.write(temp)
 
     
