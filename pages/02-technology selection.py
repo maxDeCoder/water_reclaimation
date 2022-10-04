@@ -173,13 +173,13 @@ if len(required_demand) != 0 and _continue:
 
         new_values = np.array([temp[waste_labels].iloc[0].to_numpy() for _ in range(len(tech_stack_df))])
 
-        st.write(new_values)
+        # st.write(new_values)
         after_treatment[waste_labels] = new_values * tech_stack_df[waste_labels]
         # temp_no_upgrade.loc[waste_labels + dev_labels] = after_treatment
         # st.write(after_treatment)
         # st.write(temp_no_upgrade.columns)
         temp_no_upgrade[waste_labels]=after_treatment[waste_labels]
-        st.write(temp_no_upgrade)
+        # st.write(temp_no_upgrade)
         # st.write(temp)
 
     
@@ -239,7 +239,7 @@ if len(required_demand) != 0 and _continue:
                 st.subheader("Upgrade options:")
             else:
                 st.subheader("Available options:")
-            for i in temp.index:
+            for i in temp.index[:10]:
                 with st.expander(f"{i+1} - {temp.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                     primary, secondary, tertiary = temp['Tech Stack'].to_list()[i].split("+")
                     
@@ -259,7 +259,7 @@ if len(required_demand) != 0 and _continue:
 
             if upgrade:
                 st.subheader("Supplementing with secondary technologies:")
-                for i in temp_no_upgrade.index:
+                for i in temp_no_upgrade.index[:10]:
                     with st.expander(f"{i+1} - {temp_no_upgrade.loc[i, 'Tech Stack'].replace('+None', '').replace('+', ' + ')}"):
                         primary, secondary, tertiary = temp_no_upgrade['Tech Stack'].to_list()[i].split("+")
                         show_in_graph.append(st.checkbox(f"show in plot and save for next step", value=True if i <= top_n-1 else False, key=i+50))
