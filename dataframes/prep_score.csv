@@ -1,6 +1,6 @@
-Comment,Lower,Higher
-Very Poor,-143,-86
-Poor,-85,-28
-Average,-27,27
-Good,28,85
-Excellent,86,143
+Comment,Lower,Higher,Color
+Very Poor,-11,-6,red
+Poor,-5,-1,orange
+Average,0,0,yellow
+Good,1,5,blue
+Excellent,6,11,green

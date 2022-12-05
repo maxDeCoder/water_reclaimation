@@ -257,7 +257,10 @@ with st.expander("PI calculation formula", False):
     st.markdown("##### PI = Σ (Implementation/Planning State * Significance + Impact Reversibility + Impact Cumulativeness)")
 
 st.write("\n")
-st.markdown(f"### Total Score: {round(vuln_value+prep_value, 2)}")
+total_score = round(vuln_value+prep_value, 2)
+total_comment = comments["prep"][c]["Comment"].to_list()[0]
+st.markdown(f"### Total Score: {total_score}")
+st.markdown(f"### Comment: {total_comment}")
 
 with st.expander("Total Score calculation formula", False):
     st.markdown("##### Total Score = VI * (0.5/8) + PI * (0.5/13)")
