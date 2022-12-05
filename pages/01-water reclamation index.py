@@ -172,7 +172,7 @@ for label in vuln_items:
 
         vuln_scores.append(x)
 
-vuln_value = sum_score(vuln_scores)
+vuln_value = sum_score(vuln_scores) * 0.065
 a = comments["vuln"]["Lower"] <= vuln_value
 b = comments["vuln"]["Higher"] >= vuln_value
 c = a*b
@@ -181,7 +181,7 @@ vuln_comment = comments["vuln"][c]["Comment"].to_list()[0]
 temp_df_vuln = comments["wr"]
 color_vuln = []
 for item in vuln_scores:
-    a = temp_df_vuln["Lower"] <= item.data
+    a = temp_df_vuln["Lower"] < item.data
     b = temp_df_vuln["Higher"] >= item.data
     c = a*b
     color_vuln.append(temp_df_vuln[c]["Color"].to_list()[0])
@@ -230,7 +230,7 @@ for label in prep_items:
 
         prep_scores.append(x)
 
-prep_value = sum_score(prep_scores)
+prep_value = sum_score(prep_scores)*(0.5/13)
 a = comments["prep"]["Lower"] <= prep_value
 b = comments["prep"]["Higher"] >= prep_value
 c = a*b
@@ -257,7 +257,7 @@ with st.expander("PI calculation formula", False):
     st.markdown("##### PI = Σ (Implementation/Planning State * Significance + Impact Reversibility + Impact Cumulativeness)")
 
 st.write("\n")
-st.markdown(f"### Total Score: {vuln_value+prep_value}")
+st.markdown(f"### Total Score: {round(vuln_value+prep_value, 2)}")
 
 with st.expander("Total Score calculation formula", False):
     st.markdown("##### Total Score = VI + PI")
