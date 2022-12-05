@@ -2,3 +2,4 @@ pandas
 plotly
 matplotlib
 numpy
+streamlit==1.10.0
