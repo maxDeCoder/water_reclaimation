@@ -260,7 +260,7 @@ st.write("\n")
 st.markdown(f"### Total Score: {round(vuln_value+prep_value, 2)}")
 
 with st.expander("Total Score calculation formula", False):
-    st.markdown("##### Total Score = VI + PI")
+    st.markdown("##### Total Score = VI * 0.065 + PI * (0.5/13)")
 
 # st.write(colors)
 st.markdown("🟥 - Very Poor  🟧 - Poor  🟨 - Bad  🟦 - Satisfactory  🟩 - Good")

@@ -87,8 +87,6 @@ for i in range(num_reuse):
         demand_value = st.number_input("Demand (MLD)", value=0, min_value=0, key=i+20)
         reuse_dict["Demand"].append(demand_value)
 
-st.write(reuse_dict)
-
 df = pd.DataFrame(reuse_dict)
 st.markdown(f"### Total demand: {df['Demand'].sum()} MLD")
 
