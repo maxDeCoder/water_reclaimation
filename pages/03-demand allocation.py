@@ -80,11 +80,11 @@ num_reuse = int(st.number_input("Number of Reuse", value=1, min_value=1))
 for i in range(num_reuse):
     cols = st.columns(2)
     with cols[0]:
-        selected = st.selectbox("Reuse Purpose", reuse_to_category["Reuse"], key=i+10)
+        selected = st.selectbox("Reuse Purpose", reuse_to_category["Reuse"], key=i+1000)
         reuse_dict["Reuse"].append(selected)
         reuse_dict["Category"].append(reuse_to_category[reuse_to_category["Reuse"] == selected]["Category"].to_list()[0])
     with cols[1]:
-        demand_value = st.number_input("Demand (MLD)", value=0, min_value=0, key=i+20)
+        demand_value = st.number_input("Demand (MLD)", value=0, min_value=0, key=i+20000)
         reuse_dict["Demand"].append(demand_value)
 
 df = pd.DataFrame(reuse_dict)
